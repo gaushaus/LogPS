@@ -1,2 +1,0 @@
-# gaushaus.github.io
-LogPS
