@@ -674,7 +674,7 @@ function ensureTeamDirectory(){
   grid.innerHTML = '';
   const teams = [["ASD", "Atletico Santo Domingo"], ["ALT", "Altagracia CF"], ["HER", "AC Hermosa"], ["RIV", "Sportive Riviera"], ["CAP", "Capois Old Boys CF"], ["MAR", "Marinos de Puntacana"], ["OSM", "Olympique Saint-Martin"], ["ROC", "RC Rocher"], ["RSB", "Red Star Belladere"], ["HIG", "Atletico Higuey"], ["UDN", "Nagua"], ["ASL", "AS Leogane"], ["CFM", "CF Montreval"], ["DPS", "Deportivo Santana"], ["FCS", "FC Santiago"], ["PAT", "Gonayiv Patizan"], ["CSM", "CS Marbella"], ["PSJ", "Port-au-Prince Saint-Jean"], ["PIT", "CA Pitres"], ["PON", "Sporting Pontezuela"], ["PDE", "Independiente Pedernales"], ["UPP", "Unicado Puerto Plata"], ["ROM", "Real Romana"], ["BAR", "SC Barahona"], ["VIC", "SC Victoria"], ["MIR", "Stade de Miragaone"], ["VAN", "FC Vantes"], ["ISI", "Villa Isidro"], ["ESP", "CD Esperanza"], ["RSA", "Real Santiago"], ["SCB", "SC Barracas"], ["TOR", "CA Tortuga"]];
   teams.forEach(([code, name]) => {
-    const logo = (window.teamLogos && teamLogos[code]) || '';
+    const logo = teamLogos[code] || '';
     const card = document.createElement('div');
     card.className = 'card';
     card.style.cssText = 'margin-bottom:0;display:flex;align-items:center;gap:12px;padding:12px 14px';
