@@ -60,7 +60,7 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit}
 input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--pri);outline-offset:3px;border-radius:var(--r-sm)}
 input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
-.app{display:grid;grid-template-columns:260px 1fr;grid-template-rows:auto 1fr;min-height:100dvh}
+.app{display:grid;grid-template-columns:var(--sb-w,260px) 1fr;grid-template-rows:auto 1fr;min-height:100dvh}
 
 /* TOPBAR */
 .topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:var(--s4) var(--s6);background:var(--sf);border-bottom:1px solid var(--brd);position:sticky;top:0;z-index:100}
@@ -360,6 +360,47 @@ select::-ms-expand { display:none; }
 .logo-select-trigger { position: relative; z-index: 2; }
 .logo-select-dropdown { z-index: 5000; }
 
+/* TEAM DIRECTORY CARDS */
+.team-card{background:var(--sf);border:1px solid var(--brd);border-radius:var(--r-xl);box-shadow:var(--sh-sm);cursor:pointer;overflow:hidden;align-self:start;transition:box-shadow 320ms ease,opacity 260ms ease;display:flex;flex-direction:column}
+.team-card.expanded{grid-column:1/-1;order:-1}
+.team-card.dim{opacity:0.3;pointer-events:none;transform:scale(.99)}
+.team-card.dim-out{transition:opacity 280ms ease,transform 280ms ease}
+.team-card-header{display:flex;align-items:center;gap:12px;padding:12px 14px;flex:1;min-height:0}
+.team-card-logo-sm{width:40px;height:40px;object-fit:contain;border-radius:6px;flex-shrink:0;transition:opacity var(--tr)}
+.team-card-logo-placeholder{width:40px;height:40px;background:var(--sfd);border-radius:6px;flex-shrink:0}
+.team-card-headtext{flex:1;min-width:0}
+.team-card-code{font-size:var(--text-xs);color:var(--txf);text-transform:uppercase;letter-spacing:.08em}
+.team-card-name{font-weight:600;font-size:var(--text-sm)}
+.team-card-chevron{width:16px;height:16px;flex-shrink:0;color:var(--txf);transition:transform var(--tr)}
+.team-card.expanded .team-card-chevron{transform:rotate(180deg);color:var(--pri)}
+.team-card-expand{max-height:0;overflow:hidden;opacity:0;transition:max-height 160ms cubic-bezier(.4,0,1,1), opacity 130ms ease;flex-shrink:0}
+.team-card.expanded .team-card-expand{opacity:1;transition:max-height 320ms cubic-bezier(0,0,.2,1), opacity 260ms ease}
+.team-card-expand-inner{display:flex;gap:var(--s6);align-items:flex-start;padding:0 var(--s5) var(--s5);border-top:1px solid var(--div);padding-top:var(--s5)}
+.team-card-expand-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--s3)}
+.team-card-title{font-size:var(--text-lg);font-weight:700;letter-spacing:-.02em;color:var(--tx)}
+.team-card-nickname{font-size:var(--text-sm);font-weight:600;color:var(--pri)}
+.team-card-desc{font-size:var(--text-sm);color:var(--txm);line-height:1.5}
+.team-card-meta{display:flex;flex-direction:column;gap:2px}
+.team-card-meta-label{font-size:var(--text-xs);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--txf)}
+.team-card-meta-val{font-size:var(--text-sm);color:var(--tx)}
+.team-card-colors{display:flex;align-items:center;gap:var(--s3)}
+.color-swatch{display:inline-flex;align-items:center;gap:6px;font-size:var(--text-xs);color:var(--txm)}
+.color-swatch-dot{width:18px;height:18px;border-radius:var(--r-full);border:1px solid var(--brd);flex-shrink:0;box-shadow:var(--sh-sm)}
+.team-card-logo-lg{width:96px;height:96px;object-fit:contain;border-radius:var(--r-lg);flex-shrink:0;background:var(--sfo)}
+.team-card-logo-lg-placeholder{width:96px;height:96px;border-radius:var(--r-lg);background:var(--sfd);flex-shrink:0}
+
+
+/* Sidebar resize handle */
+#sidebarResizer{
+  position:fixed;top:57px;width:8px;height:calc(100dvh - 57px);cursor:col-resize;z-index:300;
+  display:flex;align-items:center;justify-content:center;touch-action:none;
+}
+#sidebarResizer::after{
+  content:'';display:block;width:2px;height:40px;
+  background:var(--brd);border-radius:2px;transition:background var(--tr);
+}
+#sidebarResizer:hover::after,#sidebarResizer.dragging::after{background:var(--pri)}
+
 </style>
 </head>
 <body>
@@ -385,7 +426,7 @@ select::-ms-expand { display:none; }
   <span class="sidebar-section-label">Navigation</span>
   <button class="sidebar-item active" onclick="showView('log',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-    Log a Game
+    LogPS
   </button>
   <button class="sidebar-item" onclick="showView('output',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
@@ -586,6 +627,7 @@ select::-ms-expand { display:none; }
 </div>
 
 </main>
+<div id="sidebarResizer"></div>
 </div>
 <div class="toast-container" id="toastContainer"></div>
 
@@ -663,6 +705,29 @@ const teamNames = {
 };
 
 
+// Placeholder copy for the team directory expand panels — replace per-team later.
+const TEAM_PLACEHOLDER_NICKNAME   = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+const TEAM_PLACEHOLDER_DESC       = 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
+const TEAM_PLACEHOLDER_LOCATION   = 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.';
+const TEAM_PLACEHOLDER_STADIUM    = 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.';
+const TEAM_PLACEHOLDER_RIVALRY    = 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.';
+const TEAM_PLACEHOLDER_HOME_COLOR = '#5fa8b5';
+const TEAM_PLACEHOLDER_AWAY_COLOR = '#1a1917';
+
+// Per-team detail/colour data — each entry can be customized individually later.
+const teamDetails = {};
+Object.keys(teamNames).forEach(code => {
+  teamDetails[code] = {
+    nickname:    TEAM_PLACEHOLDER_NICKNAME,
+    description: TEAM_PLACEHOLDER_DESC,
+    location:    TEAM_PLACEHOLDER_LOCATION,
+    stadium:     TEAM_PLACEHOLDER_STADIUM,
+    rivalry:     TEAM_PLACEHOLDER_RIVALRY,
+    homeColor:   TEAM_PLACEHOLDER_HOME_COLOR,
+    awayColor:   TEAM_PLACEHOLDER_AWAY_COLOR,
+  };
+});
+
 function setTheme(theme){document.documentElement.setAttribute('data-theme', theme); localStorage.setItem('logps-theme', theme);}
 function toggleTheme(){ setTheme((document.documentElement.getAttribute('data-theme')||'dark') === 'dark' ? 'light' : 'dark'); }
 
@@ -683,12 +748,90 @@ function ensureTeamDirectory(){
   const teams = [["ASD", "Atletico Santo Domingo"], ["ALT", "Altagracia CF"], ["HER", "AC Hermosa"], ["RIV", "Sportive Riviera"], ["CAP", "Capois Old Boys CF"], ["MAR", "Marinos de Puntacana"], ["OSM", "Olympique Saint-Martin"], ["ROC", "RC Rocher"], ["RSB", "Red Star Belladere"], ["HIG", "Atletico Higuey"], ["UDN", "Nagua"], ["ASL", "AS Leogane"], ["CFM", "CF Montreval"], ["DPS", "Deportivo Santana"], ["FCS", "FC Santiago"], ["PAT", "Gonayiv Patizan"], ["CSM", "CS Marbella"], ["PSJ", "Port-au-Prince Saint-Jean"], ["PIT", "CA Pitres"], ["PON", "Sporting Pontezuela"], ["PDE", "Independiente Pedernales"], ["UPP", "Unicado Puerto Plata"], ["ROM", "Real Romana"], ["BAR", "SC Barahona"], ["VIC", "SC Victoria"], ["MIR", "Stade de Miragaone"], ["VAN", "FC Vantes"], ["ISI", "Villa Isidro"], ["ESP", "CD Esperanza"], ["RSA", "Real Santiago"], ["SCB", "SC Barracas"], ["TOR", "CA Tortuga"]];
   teams.forEach(([code, name]) => {
     const logo = teamLogos[code] || '';
+    const d = teamDetails[code] || {};
     const card = document.createElement('div');
-    card.className = 'card';
-    card.style.cssText = 'margin-bottom:0;display:flex;align-items:center;gap:12px;padding:12px 14px';
-    card.innerHTML = logo ? `<img src="${logo}" alt="${name}" style="width:40px;height:40px;object-fit:contain;border-radius:6px;flex-shrink:0"><div><div style="font-size:var(--text-xs);color:var(--txf);text-transform:uppercase;letter-spacing:.08em">${code}</div><div style="font-weight:600;font-size:var(--text-sm)">${name}</div></div>` : `<div style="width:40px;height:40px;background:var(--sfd);border-radius:6px;flex-shrink:0"></div><div><div style="font-size:var(--text-xs);color:var(--txf);text-transform:uppercase;letter-spacing:.08em">${code}</div><div style="font-weight:600;font-size:var(--text-sm)">${name}</div></div>`;
+    card.className = 'team-card';
+    card.id = 'team-card-' + code;
+    card.onclick = () => toggleTeamCard(code);
+    card.innerHTML = `
+      <div class="team-card-header">
+        ${logo ? `<img class="team-card-logo-sm" src="${logo}" alt="${name}">` : `<div class="team-card-logo-placeholder"></div>`}
+        <div class="team-card-headtext">
+          <div class="team-card-code">${code}</div>
+          <div class="team-card-name">${name}</div>
+        </div>
+        <svg class="team-card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="team-card-expand" id="team-expand-${code}">
+        <div class="team-card-expand-inner">
+          <div class="team-card-expand-text">
+            <div class="team-card-title">${name}</div>
+            <div class="team-card-nickname">${d.nickname || ''}</div>
+            <div class="team-card-desc">${d.description || ''}</div>
+            <div class="team-card-meta"><span class="team-card-meta-label">Location</span><span class="team-card-meta-val">${d.location || ''}</span></div>
+            <div class="team-card-meta"><span class="team-card-meta-label">Stadium</span><span class="team-card-meta-val">${d.stadium || ''}</span></div>
+            <div class="team-card-meta"><span class="team-card-meta-label">Colors</span>
+              <span class="team-card-colors">
+                <span class="color-swatch"><span class="color-swatch-dot" style="background:${d.homeColor}"></span>Home</span>
+                <span class="color-swatch"><span class="color-swatch-dot" style="background:${d.awayColor}"></span>Away</span>
+              </span>
+            </div>
+            <div class="team-card-meta"><span class="team-card-meta-label">Rivalry</span><span class="team-card-meta-val">${d.rivalry || ''}</span></div>
+          </div>
+          ${logo ? `<img class="team-card-logo-lg" src="${logo}" alt="${name}">` : `<div class="team-card-logo-lg-placeholder"></div>`}
+        </div>
+      </div>`;
     grid.appendChild(card);
   });
+}
+function equaliseTeamCards() {
+  const grid = document.getElementById('team-dir-grid');
+  if (!grid) return;
+  const cards = Array.from(grid.querySelectorAll('.team-card:not(.expanded)'));
+  if (!cards.length) return;
+  cards.forEach(c => { c.style.minHeight = ''; });
+  // Double rAF to ensure layout is complete
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const maxH = cards.reduce((m, c) => Math.max(m, c.getBoundingClientRect().height), 0);
+    if (maxH > 0) cards.forEach(c => { c.style.minHeight = maxH + 'px'; });
+  }));
+}
+
+function toggleTeamCard(code) {
+  const card   = document.getElementById('team-card-' + code);
+  const expand = document.getElementById('team-expand-' + code);
+  if (!card || !expand) return;
+  const isOpen = card.classList.contains('expanded');
+  if (isOpen) {
+    expand.style.maxHeight = expand.scrollHeight + 'px';
+    requestAnimationFrame(() => { expand.style.maxHeight = '0px'; });
+    const onEnd = e => {
+      if (e.propertyName !== 'max-height') return;
+      card.classList.remove('expanded');
+      expand.removeEventListener('transitionend', onEnd);
+      document.querySelectorAll('.team-card').forEach(c => {
+        c.classList.remove('dim');
+      });
+    };
+    expand.addEventListener('transitionend', onEnd);
+  } else {
+    document.querySelectorAll('.team-card.expanded').forEach(other => {
+      const oc = other.id.replace('team-card-','');
+      if (oc !== code) {
+        const ox = document.getElementById('team-expand-' + oc);
+        if (ox) { ox.style.maxHeight = '0px'; }
+        other.classList.remove('expanded');
+      }
+    });
+    document.querySelectorAll('.team-card').forEach(c => {
+      if (c !== card) c.classList.add('dim');
+      else c.classList.remove('dim');
+    });
+    card.classList.add('expanded');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => { expand.style.maxHeight = (expand.scrollHeight + 4) + 'px'; });
+    });
+  }
 }
 
 // ══════════════════════════════════════════
@@ -713,6 +856,7 @@ function showView(name, triggerBtn) {
   document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
   if (triggerBtn) triggerBtn.classList.add('active');
+  if (name === 'teams') equaliseTeamCards();
 }
 function stepClick(n) {
   if (n > 1 && currentStep === 1) { if (!validateStep1()) return; updateMatchHeader(); }
@@ -742,15 +886,17 @@ function goStepInternal(n) {
 // Competition type constants (needed early by validateStep1)
 const CUP_COMPS    = ['Copa de la Isla','BC Cup','LC Cup','Supercopa'];
 const LEAGUE_COMPS = ['Liga Primera','Liga Segunda'];
+const FINAL_ONLY_COMPS = ['Trophée des Campeones'];
 const ROUND_OPTS_3 = ['Final','Semi-Final','Quarter-Final'];
 const ROUND_OPTS_2 = ['Final','Semi-Final'];
+function isCupLike(comp) { return CUP_COMPS.includes(comp) || FINAL_ONLY_COMPS.includes(comp); }
 function validateStep1() {
   const s    = document.getElementById('seasonNumber').value.trim();
   const comp = document.getElementById('competition').value;
   const md   = document.getElementById('matchday').value;
   const h    = document.getElementById('teamHome').value;
   const a    = document.getElementById('teamAway').value;
-  const isCup = CUP_COMPS && CUP_COMPS.includes(comp);
+  const isCup = isCupLike(comp);
   const mw   = isCup ? '1' : document.getElementById('matchweek').value;
   if (!comp) { showToast('Please select a competition.','error'); return false; }
   if (!s)    { showToast('Please enter a season number.','error'); return false; }
@@ -790,7 +936,7 @@ function updateMatchHeader() {
   const away = document.getElementById('teamAway').value;
   document.getElementById('hdr-season').textContent = 'S'+season;
   const _comp = document.getElementById('competition').value;
-  const _isCup = CUP_COMPS.includes(_comp);
+  const _isCup = isCupLike(_comp);
   document.getElementById('hdr-mw').textContent = _isCup ? (md || '—') : (mw && md ? `MW${mw} / MD${md}` : '— / —');
   updateMwHeaderLabel(_comp);
   document.getElementById('hdr-home').textContent = home;
@@ -1128,7 +1274,7 @@ function generateOutput() {
   const hEmoji   = teamEmojis[homeCode] || homeCode;
   const aEmoji   = teamEmojis[awayCode] || awayCode;
   const gH = state.goalsHome, gA = state.goalsAway;
-  const isCup = CUP_COMPS.includes(comp);
+  const isCup = isCupLike(comp);
 
   // Competition-specific tokens
   const compEmojiMap = {
@@ -1138,6 +1284,7 @@ function generateOutput() {
     'Copa de la Isla':  ':copaisla:',
     'LC Cup':           ':LuciColaCup:',
     'BC Cup':           ':BurgerCastleCup:',
+    'Trophée des Campeones': ':trofee:',
   };
   const compNameMap = {
     'Liga Primera':    'LIGA PRIMERA SALAMANCA',
@@ -1146,6 +1293,7 @@ function generateOutput() {
     'Copa de la Isla':  'COPA DE LA ISLA',
     'LC Cup':           'LUCI COLA CUP',
     'BC Cup':           'BURGER CASTLE CUP',
+    'Trophée des Campeones': 'TROPHÉE DES CAMPEONES',
   };
   const compEmoji = compEmojiMap[comp] || ':LPSalt:';
   const compName  = compNameMap[comp]  || 'LIGA PRIMERA SALAMANCA';
@@ -1170,7 +1318,7 @@ function generateOutput() {
   state.scorers.away.forEach(sc => sc.goals.forEach(g => { if (sc.name&&g.minute) aGoalEvts.push({name:sc.name,time:fmtMin(g.minute,g.extraMin), ownGoal:!!g.ownGoal}); }));
   if (!hGoalEvts.length && !aGoalEvts.length) { out += `\nN/A\n`; }
   else {
-    function renderGoalSide(events, emoji) {
+    function renderGoalSide(events, emoji, oppEmoji) {
       let s = '';
       const regular = events.filter(e=>!e.ownGoal);
       const owns    = events.filter(e=>e.ownGoal);
@@ -1185,13 +1333,13 @@ function generateOutput() {
       if (owns.length) {
         groupByPlayer(owns).forEach(p => {
           const emojiStr = ':OwnGoal: '.repeat(p.times.length).trim();
-          s += `${emoji} ${emojiStr} ${p.name} ${p.times.join(', ')}\n`;
+          s += `${emoji} (${oppEmoji}) ${emojiStr} ${p.name} ${p.times.join(', ')}\n`;
         });
       }
       return s;
     }
-    if (hGoalEvts.length) { out += renderGoalSide(hGoalEvts, hEmoji); out += `\n`; }
-    if (aGoalEvts.length) { out += renderGoalSide(aGoalEvts, aEmoji); }
+    if (hGoalEvts.length) { out += renderGoalSide(hGoalEvts, hEmoji, aEmoji); out += `\n`; }
+    if (aGoalEvts.length) { out += renderGoalSide(aGoalEvts, aEmoji, hEmoji); }
   }
 
 // ── ASSISTS ──
@@ -1395,7 +1543,8 @@ const compLogos = {
   "Copa de la Isla": "https://raw.githubusercontent.com/gaushaus/LogPS/main/img/competitions/copaisla.png",
   "Supercopa": "https://raw.githubusercontent.com/gaushaus/LogPS/main/img/competitions/supercopa.png",
   "BC Cup": "https://raw.githubusercontent.com/gaushaus/LogPS/main/img/competitions/bccup.png",
-  "LC Cup": "https://raw.githubusercontent.com/gaushaus/LogPS/main/img/competitions/lccup.png"
+  "LC Cup": "https://raw.githubusercontent.com/gaushaus/LogPS/main/img/competitions/lccup.png",
+  "Trophée des Campeones": "https://raw.githubusercontent.com/gaushaus/LogPS/main/img/competitions/trofeo.png"
 };
 
 
@@ -1443,6 +1592,7 @@ const compOptionsList = [
   {value:'Supercopa',         label:'Supercopa'},
   {value:'BC Cup',            label:'BC Cup'},
   {value:'LC Cup',            label:'LC Cup'},
+  {value:'Trophée des Campeones', label:'Trophée des Campeones'},
 ];
 
 function selectLogoOption(wrapperId, hiddenId, value, label, logos, placeholder, onChange) {
@@ -1629,16 +1779,27 @@ function onCompetitionChange(val) {
   const mdField  = document.getElementById('md-field');
   const mdLabel  = document.getElementById('md-label');
   const mdSel    = document.getElementById('matchday');
-  const isCup    = CUP_COMPS.includes(val);
+  const isCup       = CUP_COMPS.includes(val);
+  const isFinalOnly = FINAL_ONLY_COMPS.includes(val);
   const is3Round = ['Copa de la Isla','BC Cup'].includes(val);
   const is2Round = ['LC Cup','Supercopa'].includes(val);
 
   // Show/hide matchweek
-  if (mwField) mwField.style.display = isCup ? 'none' : '';
+  if (mwField) mwField.style.display = (isCup || isFinalOnly) ? 'none' : '';
+  // Show/hide matchday/round field entirely
+  if (mdField) mdField.style.display = isFinalOnly ? 'none' : '';
 
   // Rebuild matchday/round dropdown
-  if (mdLabel) mdLabel.textContent = isCup ? 'Round' : 'Matchday';
+  if (mdLabel) mdLabel.textContent = (isCup || isFinalOnly) ? 'Round' : 'Matchday';
   mdSel.innerHTML = '';
+
+  if (isFinalOnly) {
+    const o = document.createElement('option'); o.value = 'Final'; o.textContent = 'Final'; mdSel.appendChild(o);
+    mdSel.value = 'Final';
+    updateMwHeaderLabel(val);
+    return;
+  }
+
   const placeholder = document.createElement('option');
   placeholder.value = ''; placeholder.textContent = '— Select —';
   mdSel.appendChild(placeholder);
@@ -1658,9 +1819,65 @@ function onCompetitionChange(val) {
 function updateMwHeaderLabel(val) {
   const labelEl = document.getElementById('hdr-mw-label');
   if (!labelEl) return;
-  const isCup = CUP_COMPS.includes(val);
+  const isCup = isCupLike(val);
   labelEl.textContent = isCup ? 'Round' : 'MW / MD';
 }
+
+
+// ── SIDEBAR RESIZER ──
+(function(){
+  const resizer = document.getElementById('sidebarResizer');
+  const app = document.querySelector('.app');
+  const sidebar = document.querySelector('.sidebar');
+  if (!resizer || !app || !sidebar) return;
+  const MIN_W = 160, MAX_W = 320;
+  let startX, startW, isDragging = false;
+  function positionResizer() {
+    const sbRect = sidebar.getBoundingClientRect();
+    resizer.style.left = (sbRect.right - 4) + 'px';
+  }
+  positionResizer();
+  window.addEventListener('resize', positionResizer);
+  resizer.addEventListener('mousedown', e => {
+    e.preventDefault();
+    isDragging = true;
+    startX = e.clientX;
+    startW = sidebar.getBoundingClientRect().width;
+    resizer.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  });
+  document.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    const newW = Math.min(MAX_W, Math.max(MIN_W, startW + (e.clientX - startX)));
+    app.style.setProperty('--sb-w', newW + 'px');
+    positionResizer();
+  });
+  document.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    resizer.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    positionResizer();
+  });
+  resizer.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startW = sidebar.getBoundingClientRect().width;
+    const onMove = e => {
+      const newW = Math.min(MAX_W, Math.max(MIN_W, startW + (e.touches[0].clientX - startX)));
+      app.style.setProperty('--sb-w', newW + 'px');
+      positionResizer();
+    };
+    const onUp = () => {
+      positionResizer();
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('touchend', onUp);
+    };
+    document.addEventListener('touchmove', onMove, {passive:true});
+    document.addEventListener('touchend', onUp);
+  }, {passive:true});
+})();
 
 </script>
 </body>
